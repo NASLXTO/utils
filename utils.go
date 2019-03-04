@@ -1,5 +1,7 @@
 package utils
 
+//Version 3.1
+
 import (
 	"bufio"
 	"fmt"
@@ -257,11 +259,32 @@ func (arr *LstArray) Less(i, j int) bool {
 	arr2 := arr.mArr[j]
 
 	for index := arr.firstIndex; index < len(arr1); index++ {
-		if arr1[index] < arr2[index] {
-			return true
-		} else if arr1[index] > arr2[index] {
-			return false
+		f1, err1 := strconv.ParseFloat(arr1[index], 64)
+		f2, err2 := strconv.ParseFloat(arr2[index], 64)
+
+		if err1 == nil && err2 == nil {
+			v1 := f1
+			v2 := f2
+			if v1 < v2 {
+				return true
+			} else if v1 > v2 {
+				return false
+			}
+		} else {
+			v1 := arr1[index]
+			v2 := arr2[index]
+			if v1 < v2 {
+				return true
+			} else if v1 > v2 {
+				return false
+			}
 		}
+
+		//		if arr1[index] < arr2[index] {
+		//			return true
+		//		} else if arr1[index] > arr2[index] {
+		//			return false
+		//		}
 	}
 	return i < j
 }
@@ -362,6 +385,26 @@ func ExportFile(dir, name string, data [][]string) {
 	expath := path.Join(dir, date+"-"+name)
 
 	datastr := Lst2Str2(data)
+	file, err := os.OpenFile(expath, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	bufferedWriter := bufio.NewWriter(file)
+	if _, err = bufferedWriter.WriteString(datastr); err != nil {
+		panic(err)
+	} else {
+		fmt.Println(expath)
+	}
+	bufferedWriter.Flush()
+}
+
+func ExportFileS(dir, name string, datastr string) {
+	CheckPath(dir)
+	date := time.Now().Format("20060102150405") //固定时间格式 Jan 2 15:04:05 2006 MST : 1 2 3 4 5 6 -7
+	expath := path.Join(dir, date+"-"+name)
+
 	file, err := os.OpenFile(expath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		panic(err)
