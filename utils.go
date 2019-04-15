@@ -15,6 +15,8 @@ import (
 	"time"
 )
 
+const datefm = "20060102" //20060102150405 固定时间格式 Jan 2 15:04:05 2006 MST : 1 2 3 4 5 6 -7
+
 func CheckPath(dir string) {
 	if f, err := os.Stat(dir); err != nil {
 		if err := os.Mkdir(dir, os.ModePerm); err != nil {
@@ -381,7 +383,7 @@ func ExportFileA(seekSize int64, data [][]string, expath string) {
 
 func ExportFile(dir, name string, data [][]string) {
 	CheckPath(dir)
-	date := time.Now().Format("20060102150405") //固定时间格式 Jan 2 15:04:05 2006 MST : 1 2 3 4 5 6 -7
+	date := time.Now().Format(datefm)
 	expath := path.Join(dir, date+"-"+name)
 
 	datastr := Lst2Str2(data)
@@ -402,8 +404,12 @@ func ExportFile(dir, name string, data [][]string) {
 
 func ExportFileS(dir, name string, datastr string) {
 	CheckPath(dir)
-	date := time.Now().Format("20060102150405") //固定时间格式 Jan 2 15:04:05 2006 MST : 1 2 3 4 5 6 -7
+	date := time.Now().Format(datefm)
 	expath := path.Join(dir, date+"-"+name)
+
+	if del := os.Remove(expath); del != nil {
+		fmt.Println("ExportFileS:", del)
+	}
 
 	file, err := os.OpenFile(expath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
