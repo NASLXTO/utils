@@ -1,6 +1,6 @@
 package utils
 
-//Version 3.1
+//Version 3.2
 
 import (
 	"bufio"
@@ -341,27 +341,27 @@ func ReadFile(file string) [][]string {
 	}
 }
 
-func Lst2Str(datalst []string) (datastr string) {
+func Lst2Str(datalst []string, sep string) (datastr string) {
 	for _, str := range datalst {
-		datastr += str + "\t"
+		datastr += str + sep
 	}
-	datastr = strings.TrimRight(datastr, "\t")
+	datastr = strings.TrimRight(datastr, sep)
 	return
 }
 
-func Lst2Str2(datalst [][]string) (datastr string) {
+func Lst2Str2(datalst [][]string, sep string) (datastr string) {
 	for _, line := range datalst {
 		for _, str := range line {
-			datastr += str + "\t"
+			datastr += str + sep
 		}
-		datastr = strings.TrimRight(datastr, "\t") + "\n"
+		datastr = strings.TrimRight(datastr, sep) + "\n"
 	}
 	datastr = strings.TrimRight(datastr, "\n")
 	return
 }
 
 func ExportFileA(seekSize int64, data [][]string, expath string) {
-	datastr := Lst2Str2(data)
+	datastr := Lst2Str2(data, "\t")
 	file, err := os.OpenFile(expath, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
 		panic(err)
@@ -372,7 +372,8 @@ func ExportFileA(seekSize int64, data [][]string, expath string) {
 	if err != nil {
 		panic(err2)
 	}
-	file.Truncate(position)
+
+	os.Truncate(file.Name(), position)
 
 	bufferedWriter := bufio.NewWriter(file)
 	if _, err = bufferedWriter.WriteString(datastr); err != nil {
@@ -383,10 +384,10 @@ func ExportFileA(seekSize int64, data [][]string, expath string) {
 
 func ExportFile(dir, name string, data [][]string) {
 	CheckPath(dir)
-	date := time.Now().Format(datefm)
+	date := time.Now().Format("20060102150405") //固定时间格式 Jan 2 15:04:05 2006 MST : 1 2 3 4 5 6 -7
 	expath := path.Join(dir, date+"-"+name)
 
-	datastr := Lst2Str2(data)
+	datastr := Lst2Str2(data, ",")
 	file, err := os.OpenFile(expath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		panic(err)
